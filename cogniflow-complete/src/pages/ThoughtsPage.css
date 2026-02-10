@@ -1,0 +1,33 @@
+.thoughts-page {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.helper-text {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.thoughts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.thought-item {
+  padding: 1rem;
+  background: var(--surface-dim);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-light);
+}
+
+.thought-content {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.thought-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}

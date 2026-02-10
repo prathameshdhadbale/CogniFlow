@@ -1,0 +1,27 @@
+.focus-window {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.focus-window h3 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.focus-window .time-range {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.focus-window p {
+  opacity: 0.9;
+  font-size: 0.95rem;
+  margin: 0;
+}

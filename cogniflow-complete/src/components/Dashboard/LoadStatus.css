@@ -1,0 +1,45 @@
+.load-status {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.load-status.light {
+  background: var(--load-light);
+  border-left: 4px solid #28a745;
+}
+
+.load-status.optimal {
+  background: var(--load-optimal);
+  border-left: 4px solid #ffc107;
+}
+
+.load-status.heavy {
+  background: var(--load-heavy);
+  border-left: 4px solid #dc3545;
+}
+
+.load-icon {
+  font-size: 2rem;
+}
+
+.load-content h3 {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.load-content p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.load-count {
+  margin-top: 0.5rem !important;
+  font-weight: 500;
+}
