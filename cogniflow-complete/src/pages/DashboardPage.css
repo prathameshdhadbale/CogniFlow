@@ -29,12 +29,11 @@
   border-radius: 8px;
   border-left: 4px solid var(--accent-light);
   transition: all 0.3s var(--ease-out);
-  cursor: pointer;
 }
 
 .task-item:hover {
   background: var(--surface);
-  transform: translateX(8px);
+  transform: translateX(4px);
   box-shadow: 0 2px 8px var(--shadow);
 }
 
@@ -49,6 +48,39 @@
   font-weight: 600;
   font-size: 1.05rem;
   color: var(--text-primary);
+  flex: 1;
+}
+
+.task-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.action-btn.complete {
+  color: #28a745;
+}
+
+.action-btn.complete:hover {
+  background: #d4edda;
+}
+
+.action-btn.delete {
+  color: #dc3545;
+}
+
+.action-btn.delete:hover {
+  background: #f8d7da;
 }
 
 .task-meta {
@@ -78,6 +110,48 @@
   background: var(--text-muted);
 }
 
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-badge.pending {
+  background: #ffc107;
+  color: #000;
+}
+
+.status-badge.scheduled {
+  background: #17a2b8;
+  color: white;
+}
+
+.status-badge.in-progress {
+  background: #007bff;
+  color: white;
+}
+
+.status-badge.completed {
+  background: #28a745;
+  color: white;
+}
+
+.status-badge.postponed {
+  background: #dc3545;
+  color: white;
+}
+
+.task-reason {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--surface);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
 .quick-actions {
   display: flex;
   gap: 1rem;
@@ -105,5 +179,10 @@
 @media (max-width: 768px) {
   .section-title {
     font-size: 2rem;
+  }
+
+  .task-meta {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }

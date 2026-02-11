@@ -11,12 +11,15 @@ const TasksPage = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
+    description: '',
     type: 'ai-scheduled',
     deadline: '',
     priority: '',
-    description: ''
+    difficulty: 'medium',
+    estimatedDuration: 60
   });
 
   useEffect(() => {
@@ -37,14 +40,32 @@ const TasksPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await tasksService.createTask(formData);
-      toast.success('Task created successfully!');
-      setFormData({ title: '', type: 'ai-scheduled', deadline: '', priority: '', description: '' });
-      setShowForm(false);
+      if (editingTask) {
+        await tasksService.updateTask(editingTask._id, formData);
+        toast.success('Task updated successfully!');
+      } else {
+        await tasksService.createTask(formData);
+        toast.success('Task created successfully!');
+      }
+      resetForm();
       fetchTasks();
     } catch (error) {
-      toast.error('Failed to create task');
+      toast.error(editingTask ? 'Failed to update task' : 'Failed to create task');
     }
+  };
+
+  const handleEdit = (task) => {
+    setEditingTask(task);
+    setFormData({
+      title: task.title,
+      description: task.description || '',
+      type: task.type,
+      deadline: task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '',
+      priority: task.priority || '',
+      difficulty: task.difficulty || 'medium',
+      estimatedDuration: task.estimatedDuration || 60
+    });
+    setShowForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -59,6 +80,30 @@ const TasksPage = () => {
     }
   };
 
+  const handleComplete = async (id) => {
+    try {
+      await tasksService.completeTask(id, { actualDuration: 60 });
+      toast.success('Task marked as complete!');
+      fetchTasks();
+    } catch (error) {
+      toast.error('Failed to complete task');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      type: 'ai-scheduled',
+      deadline: '',
+      priority: '',
+      difficulty: 'medium',
+      estimatedDuration: 60
+    });
+    setShowForm(false);
+    setEditingTask(null);
+  };
+
   if (loading) return <Loading message="Loading tasks..." />;
 
   return (
@@ -68,13 +113,19 @@ const TasksPage = () => {
           <h1 className="section-title">Tasks</h1>
           <p className="section-subtitle">Manage your AI-scheduled and manual tasks</p>
         </div>
-        <Button variant="primary" onClick={() => setShowForm(!showForm)}>
+        <Button
+          variant="primary"
+          onClick={() => {
+            resetForm();
+            setShowForm(!showForm);
+          }}
+        >
           {showForm ? 'Cancel' : '+ New Task'}
         </Button>
       </div>
 
       {showForm && (
-        <Card title="Create New Task">
+        <Card title={editingTask ? 'Edit Task' : 'Create New Task'}>
           <form onSubmit={handleSubmit}>
             <Input
               label="Task Name"
@@ -83,16 +134,60 @@ const TasksPage = () => {
               placeholder="What needs to be done?"
               required
             />
-            
-            <Select
-              label="Type"
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              options={[
-                { value: 'ai-scheduled', label: 'AI-Scheduled (System decides timing)' },
-                { value: 'manual', label: 'Manual (You set deadline)' }
-              ]}
+
+            <TextArea
+              label="Description (Optional)"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Add more details..."
+              rows={3}
             />
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <Select
+                label="Type"
+                value={formData.type}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                options={[
+                  { value: 'ai-scheduled', label: 'AI-Scheduled' },
+                  { value: 'manual', label: 'Manual' }
+                ]}
+              />
+
+              <Select
+                label="Priority"
+                value={formData.priority}
+                onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                options={[
+                  { value: '', label: 'Auto' },
+                  { value: 'high', label: 'High' },
+                  { value: 'medium', label: 'Medium' },
+                  { value: 'low', label: 'Low' }
+                ]}
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <Select
+                label="Difficulty"
+                value={formData.difficulty}
+                onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+                options={[
+                  { value: 'light', label: 'Light' },
+                  { value: 'medium', label: 'Medium' },
+                  { value: 'heavy', label: 'Heavy' }
+                ]}
+              />
+
+              <Input
+                label="Est. Duration (minutes)"
+                type="number"
+                value={formData.estimatedDuration}
+                onChange={(e) => setFormData({ ...formData, estimatedDuration: parseInt(e.target.value) })}
+                min="15"
+                step="15"
+              />
+            </div>
 
             {formData.type === 'manual' && (
               <Input
@@ -103,27 +198,16 @@ const TasksPage = () => {
               />
             )}
 
-            <Select
-              label="Priority (Optional)"
-              value={formData.priority}
-              onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              options={[
-                { value: '', label: 'Let system decide' },
-                { value: 'high', label: 'High' },
-                { value: 'medium', label: 'Medium' },
-                { value: 'low', label: 'Low' }
-              ]}
-            />
-
-            <TextArea
-              label="Additional Context (Optional)"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Any thoughts or context about this task..."
-              rows={4}
-            />
-
-            <Button type="submit" variant="primary">Create Task</Button>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <Button type="submit" variant="primary">
+                {editingTask ? 'Update Task' : 'Create Task'}
+              </Button>
+              {editingTask && (
+                <Button type="button" variant="secondary" onClick={resetForm}>
+                  Cancel
+                </Button>
+              )}
+            </div>
           </form>
         </Card>
       )}
@@ -132,33 +216,81 @@ const TasksPage = () => {
         {tasks.length > 0 ? (
           <div className="task-list">
             {tasks.map(task => (
-              <div key={task._id} className="task-item">
-                <div className="task-header">
-                  <div className="task-title">{task.title}</div>
-                  <div className="task-actions">
-                    <span className={`task-badge ${task.type === 'ai-scheduled' ? 'ai' : 'manual'}`}>
-                      {task.type === 'ai-scheduled' ? 'AI Scheduled' : 'Manual'}
-                    </span>
-                    <button className="delete-btn" onClick={() => handleDelete(task._id)}>×</button>
-                  </div>
-                </div>
-                {task.description && <p className="task-description">{task.description}</p>}
-                <div className="task-meta">
-                  {task.scheduledFor && (
-                    <span>⏰ {new Date(task.scheduledFor).toLocaleString()}</span>
-                  )}
-                  {task.deadline && (
-                    <span>📅 Deadline: {new Date(task.deadline).toLocaleDateString()}</span>
-                  )}
-                  <span>Status: {task.status || 'Pending'}</span>
-                </div>
-              </div>
+              <TaskItemFull
+                key={task._id}
+                task={task}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onComplete={handleComplete}
+              />
             ))}
           </div>
         ) : (
           <p className="empty-message">No tasks yet. Create your first task to get started!</p>
         )}
       </Card>
+    </div>
+  );
+};
+
+const TaskItemFull = ({ task, onEdit, onDelete, onComplete }) => {
+  const formatDateTime = (date) => {
+    if (!date) return null;
+    return new Date(date).toLocaleString();
+  };
+
+  return (
+    <div className="task-item-full">
+      <div className="task-header">
+        <div>
+          <div className="task-title">{task.title}</div>
+          {task.description && (
+            <p className="task-description">{task.description}</p>
+          )}
+        </div>
+        <div className="task-actions">
+          <span className={`task-badge ${task.type === 'ai-scheduled' ? 'ai' : 'manual'}`}>
+            {task.type === 'ai-scheduled' ? 'AI' : 'Manual'}
+          </span>
+          <span className={`status-badge ${task.status}`}>
+            {task.status}
+          </span>
+        </div>
+      </div>
+
+      <div className="task-meta">
+        {task.scheduledFor && (
+          <span>⏰ Scheduled: {formatDateTime(task.scheduledFor)}</span>
+        )}
+        {task.deadline && (
+          <span>📅 Deadline: {formatDateTime(task.deadline)}</span>
+        )}
+        <span>📊 {task.difficulty} difficulty</span>
+        <span>🎯 {task.priority || 'medium'} priority</span>
+        <span>⏱️ {task.estimatedDuration}min</span>
+      </div>
+
+      {task.schedulingReason && (
+        <div className="task-reason">
+          💡 <strong>AI says:</strong> {task.schedulingReason}
+        </div>
+      )}
+
+      <div className="task-buttons">
+        {task.status !== 'completed' && (
+          <>
+            <button className="btn-small btn-success" onClick={() => onComplete(task._id)}>
+              ✓ Complete
+            </button>
+            <button className="btn-small btn-primary" onClick={() => onEdit(task)}>
+              ✏️ Edit
+            </button>
+          </>
+        )}
+        <button className="btn-small btn-danger" onClick={() => onDelete(task._id)}>
+          🗑️ Delete
+        </button>
+      </div>
     </div>
   );
 };

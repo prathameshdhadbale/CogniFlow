@@ -11,26 +11,26 @@ export const authService = {
   },
 
   async login(credentials) {
-    // const response = await api.post('/auth/login', credentials);
-    // if (response.data.token) {
-    //   localStorage.setItem('token', response.data.token);
-    //   localStorage.setItem('user', JSON.stringify(response.data.user));
-    // }
-    // return response.data;
-    const mockResponse = {
-      data: {
-        token: 'mock-jwt-token-12345',
-        user: {
-          _id: '1',
-          name: 'Test User',
-          email: credentials.email
-        }
-      }
-    };
+    const response = await api.post('/auth/login', credentials);
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    return response.data;
+    // const mockResponse = {
+    //   data: {
+    //     token: 'mock-jwt-token-12345',
+    //     user: {
+    //       _id: '1',
+    //       name: 'Test User',
+    //       email: credentials.email
+    //     }
+    //   }
+    // };
     
-    localStorage.setItem('token', mockResponse.data.token);
-    localStorage.setItem('user', JSON.stringify(mockResponse.data.user));
-    return mockResponse.data;
+    // localStorage.setItem('token', mockResponse.data.token);
+    // localStorage.setItem('user', JSON.stringify(mockResponse.data.user));
+    // return mockResponse.data;
   },
 
   logout() {
