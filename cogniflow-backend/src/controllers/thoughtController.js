@@ -1,4 +1,7 @@
 const Thought = require('../models/Thought');
+const User = require('../models/User');
+const { processThought } = require('../services/geminiService');
+
 
 const getThoughts = async (req, res) => {
     try {
@@ -31,10 +34,30 @@ const createThought = async (req, res) => {
     try {
         const { content } = req.body;
 
+         // Get user for context
+        const user = await User.findById(req.user.id);
+        
+        // Get recent tasks count
+        const Task = require('../models/Task');
+        const recentTasksCount = await Task.countDocuments({
+            userId: req.user.id,
+            createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+        });
+
+        const userContext = {
+            patterns: user.patterns,
+            recentTasksCount
+        };
+
+        // Process thought with AI
+        const insights = await processThought(content, userContext);
+
+        // Create thought with AI-generated insights
         const thought = await Thought.create({
             userId: req.user.id,
             content,
-            processedInsights: []
+            processedInsights: insights,
+            affectedScheduling: insights.length > 0
         });
 
         res.status(201).json(thought);

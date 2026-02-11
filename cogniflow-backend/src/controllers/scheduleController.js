@@ -1,4 +1,7 @@
 const Task = require('../models/Task');
+const User = require('../models/User');
+const { generateSchedule: generateAISchedule } = require('../services/geminiService');
+
 
 const getTodaySchedule = async (req, res) => {
     try {
@@ -66,14 +69,40 @@ const getSchedule = async (req, res) => {
 
 const generateSchedule = async (req, res) => {
     try {
+        // Get user patterns
+        const user = await User.findById(req.user.id);
+
+        // Get pending tasks
         const pendingTasks = await Task.find({
             userId: req.user.id,
             status: 'pending'
         }).limit(10);
 
+        if (pendingTasks.length === 0) {
+            return res.status(200).json({
+                message: 'No pending tasks to schedule',
+                schedule: []
+            });
+        }
+
+        // Generate AI schedule
+        const aiSchedule = await generateAISchedule(pendingTasks, user.patterns);
+
+        // Update tasks with AI-generated schedule
+        for (const scheduledTask of aiSchedule.schedule) {
+            await Task.findByIdAndUpdate(scheduledTask.taskId, {
+                scheduledFor: new Date(scheduledTask.scheduledFor),
+                scheduledEndTime: new Date(scheduledTask.scheduledEndTime),
+                schedulingReason: scheduledTask.reason,
+                status: 'scheduled'
+            });
+        }
+
         res.status(200).json({
-            message: 'AI scheduling will be implemented with Gemini API',
-            pendingTasks: pendingTasks
+            message: 'Schedule generated successfully',
+            schedule: aiSchedule.schedule,
+            totalLoad: aiSchedule.totalLoad,
+            warnings: aiSchedule.warnings
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
