@@ -1,12 +1,23 @@
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const {GoogleGenerativeAI} = require('@google/generative-ai'); 
+// Validate environment variables
+if (!process.env.GEMINI_API_KEY) {
+    console.error('❌ GEMINI_API_KEY is not set in .env file');
+}
+
+if (!process.env.GEMINI_MODEL) {
+    console.warn('⚠️ GEMINI_MODEL not set, using default: gemini-1.5-pro');
+}
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ 
+    model: process.env.GEMINI_MODEL || 'gemini-1.5-pro' 
+});
 
-const model = genAI.getGenerativeModel({model : process.env.GEMINI_MODEL}); 
-
-const processThought = async (thoughtContent , userContext) =>{
-    try{
+const processThought = async (thoughtContent, userContext) => {
+    try {
+        console.log('🤖 Processing thought with AI...');
+        
         const prompt = `You are analyzing a user's productivity thought to extract actionable insights.
 
 User Context:
@@ -35,22 +46,34 @@ Focus on:
 Return at least 1-3 insights.`;
 
         const result = await model.generateContent(prompt);
-        const response = await result.response ;
-        const text = response.text() ;
+        const response = await result.response;
+        const text = response.text();
+        
+        console.log('📄 Raw AI response:', text);
+        
         const cleaned = text.replace(/```json\n?|\n?```/g, '').trim();
         const parsed = JSON.parse(cleaned);
         
+        console.log('✅ Parsed insights:', parsed.insights);
+        
         return parsed.insights || [];
-
-    }catch(error){
-        console.error('Error processing thought:', error);
-        return [];
+    } catch (error) {
+        console.error('❌ Error processing thought:', error.message);
+        console.error('Full error:', error);
+        
+        // Return fallback insights
+        return [{
+            type: 'preference',
+            signal: 'Unable to process thought automatically. Manual review needed.',
+            confidence: 0.5
+        }];
     }
-}
+};
 
-
-const generateSchedule = async (tasks , userPatterns) => {
-    try{
+const generateSchedule = async (tasks, userPatterns) => {
+    try {
+        console.log('🤖 Generating AI schedule...');
+        
         const prompt = `You are an intelligent scheduling assistant. Create an optimal schedule for these tasks.
 
 User Patterns:
@@ -81,25 +104,34 @@ Return ONLY a JSON object (no markdown, no code blocks) with this structure:
 }`;
 
         const result = await model.generateContent(prompt);
-        const response = await result.response ;
-        const text = response.text() ;
+        const response = await result.response;
+        const text = response.text();
+        
+        console.log('📄 Raw AI schedule response:', text);
+        
         const cleaned = text.replace(/```json\n?|\n?```/g, '').trim();
         const parsed = JSON.parse(cleaned);
         
+        console.log('✅ Generated schedule:', parsed);
+        
         return parsed;
-    }catch(error){
-        console.error('Error generating schedule' , error);
-        return{
-            schedule : [] ,
-            totalLoad : "optimal",
-            warnings : ['Ai scheduling temporiarly unavailable']
+    } catch (error) {
+        console.error('❌ Error generating schedule:', error.message);
+        console.error('Full error:', error);
+        
+        return {
+            schedule: [],
+            totalLoad: 'optimal',
+            warnings: ['AI scheduling temporarily unavailable. Error: ' + error.message]
         };
     }
 };
 
-
-const chatWithAI = async (userMessage , userData) => {
-    try{
+const chatWithAI = async (userMessage, userData) => {
+    try {
+        console.log('🤖 Chatting with AI...');
+        console.log('User message:', userMessage);
+        
         const prompt = `You are CogniFlow's assistant helping users understand their productivity.
 
 User Data:
@@ -119,16 +151,19 @@ Guidelines:
 Respond naturally and conversationally in 2-3 sentences.`;
 
         const result = await model.generateContent(prompt);
-        const response = await result.response ;
-        const text = response.text() ;
-
-        return text ;
-    }catch(error){
-        console.error('Error in chat:', error);
-        return "I'm having trouble connecting right now. Please try again in a moment.";
+        const response = await result.response;
+        const text = response.text();
+        
+        console.log('✅ AI response:', text);
+        
+        return text;
+    } catch (error) {
+        console.error('❌ Error in chat:', error.message);
+        console.error('Full error:', error);
+        
+        return "I'm having trouble connecting right now. Please try again in a moment. Error: " + error.message;
     }
 };
-
 
 module.exports = {
     processThought,
