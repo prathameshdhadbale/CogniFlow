@@ -9,10 +9,7 @@ const model = genAI.getGenerativeModel({
     model: process.env.GEMINI_MODEL || 'gemini-1.5-flash-latest'
 });
 
-/**
- * UPDATED: Extraction focused, zero-fluff prompt.
- * Treats user thoughts as objective data points.
- */
+
 const processThought = async (thoughtContent, userContext) => {
     try {
         console.log('🤖 Processing thought with AI...');
@@ -58,10 +55,7 @@ Focus strictly on work style preferences and energy blockers.`;
     }
 };
 
-/**
- * UPDATED: Prioritizes user task list over "optimal" limits.
- * Will suggest an alternative only once in the "warnings" array.
- */
+
 const generateSchedule = async (tasks, userPatterns) => {
     try {
         console.log('🤖 Generating AI schedule...');
@@ -115,10 +109,7 @@ Return ONLY JSON:
     }
 };
 
-/**
- * UPDATED: "Listen first" logic.
- * Concise (2-3 sentences), non-argumentative, and compliant.
- */
+
 const chatWithAI = async (userMessage, userData) => {
     try {
         console.log('🤖 Chatting with AI...');
