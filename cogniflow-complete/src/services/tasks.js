@@ -31,6 +31,15 @@ export const tasksService = {
     return response.data;
   },
 
+  async toggleComplete(id, isCompleted) {
+    if (isCompleted) {
+      return await api.put(`/tasks/${id}/complete`, { actualDuration: 60 });
+    } else {
+      // Mark as in-progress if uncompleting
+      return await api.put(`/tasks/${id}`, { status: 'in-progress' });
+    }
+  },
+
   async getTodaysTasks() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -40,7 +49,6 @@ export const tasksService = {
     const response = await api.get('/tasks');
     const allTasks = response.data;
 
-    // Filter tasks scheduled for today or with today's deadline
     return allTasks.filter(task => {
       if (task.scheduledFor) {
         const scheduledDate = new Date(task.scheduledFor);

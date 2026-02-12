@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { chatService } from '../services/chat';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
-import Loading from '../components/common/Loading';
 import toast from 'react-hot-toast';
 import './ChatPage.css';
 
@@ -10,7 +9,7 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hello! I'm your CogniFlow assistant. I can help you understand your schedule, explain why tasks are scheduled when they are, adjust your load, or answer questions about your productivity patterns. What would you like to know?"
+      content: "Hello! I'm your CogniFlow AI assistant. I can see your tasks, thoughts, reflections, and patterns. Ask me anything about your productivity!"
     }
   ]);
   const [input, setInput] = useState('');
@@ -36,12 +35,15 @@ const ChatPage = () => {
     try {
       setLoading(true);
       const response = await chatService.sendMessage(userMessage);
-      setMessages(prev => [...prev, { role: 'assistant', content: response.message }]);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: response.message
+      }]);
     } catch (error) {
       toast.error('Failed to get response');
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: "I'm sorry, I'm having trouble connecting right now. Please try again." 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: "I'm sorry, I'm having trouble connecting right now. Please try again."
       }]);
     } finally {
       setLoading(false);
@@ -49,10 +51,14 @@ const ChatPage = () => {
   };
 
   const suggestedQuestions = [
-    "Why is this task scheduled here?",
-    "Am I overloaded this week?",
-    "What's my best work time?",
-    "Adjust tomorrow's schedule"
+    "What tasks do I have scheduled today?",
+    "What's my peak productivity time?",
+    "Show me my full schedule for this week",
+    "What do my recent thoughts say about my work style?",
+    "How am I doing with task completion?",
+    "What patterns have you noticed in my reflections?",
+    "Am I overloading myself?",
+    "When should I schedule difficult tasks?"
   ];
 
   const handleSuggestion = (question) => {
@@ -61,8 +67,10 @@ const ChatPage = () => {
 
   return (
     <div className="chat-page">
-      <h1 className="section-title">Chat Assistant</h1>
-      <p className="section-subtitle">Ask about your schedule, patterns, and get explanations</p>
+      <h1 className="section-title">AI Assistant</h1>
+      <p className="section-subtitle">
+        Ask about your schedule, patterns, thoughts, and get personalized insights
+      </p>
 
       <div className="chat-container">
         <div className="chat-messages">
@@ -89,7 +97,7 @@ const ChatPage = () => {
             className="chat-input"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about your schedule, patterns, or adjustments..."
+            placeholder="Ask about your schedule, patterns, or productivity..."
             disabled={loading}
           />
           <Button type="submit" variant="primary" disabled={loading || !input.trim()}>
@@ -98,16 +106,16 @@ const ChatPage = () => {
         </form>
       </div>
 
-      <Card title="Suggested Questions" style={{ marginTop: '2rem' }}>
+      <Card title="💡 Suggested Questions" style={{ marginTop: '2rem' }}>
         <div className="suggested-questions">
           {suggestedQuestions.map((question, index) => (
-            <Button 
-              key={index} 
-              variant="secondary" 
+            <button
+              key={index}
+              className="suggestion-btn"
               onClick={() => handleSuggestion(question)}
             >
               {question}
-            </Button>
+            </button>
           ))}
         </div>
       </Card>

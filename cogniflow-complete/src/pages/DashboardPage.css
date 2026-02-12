@@ -31,6 +31,16 @@
   transition: all 0.3s var(--ease-out);
 }
 
+.task-item.completed {
+  opacity: 0.7;
+  border-left-color: #28a745;
+}
+
+.task-item.completed .task-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
 .task-item:hover {
   background: var(--surface);
   transform: translateX(4px);
@@ -41,14 +51,34 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.task-checkbox-section {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.task-checkbox {
+  width: 20px;
+  height: 20px;
+  margin-top: 0.2rem;
+  cursor: pointer;
+  accent-color: var(--accent-light);
 }
 
 .task-title {
   font-weight: 600;
   font-size: 1.05rem;
   color: var(--text-primary);
-  flex: 1;
+}
+
+.task-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
 }
 
 .task-actions-inline {
@@ -60,19 +90,12 @@
 .action-btn {
   background: none;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   transition: all 0.2s;
-}
-
-.action-btn.complete {
-  color: #28a745;
-}
-
-.action-btn.complete:hover {
-  background: #d4edda;
+  line-height: 1;
 }
 
 .action-btn.delete {
@@ -88,8 +111,13 @@
   gap: 1rem;
   font-size: 0.85rem;
   color: var(--text-secondary);
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   flex-wrap: wrap;
+}
+
+.meta-highlight {
+  font-weight: 600;
+  color: var(--accent);
 }
 
 .task-badge {
@@ -149,7 +177,6 @@
   border-radius: 6px;
   font-size: 0.9rem;
   color: var(--text-secondary);
-  font-style: italic;
 }
 
 .quick-actions {
@@ -162,7 +189,11 @@
 .empty-message {
   text-align: center;
   color: var(--text-secondary);
-  padding: 2rem;
+  padding: 3rem 2rem;
+}
+
+.empty-message p {
+  margin: 0;
 }
 
 @keyframes fadeIn {
@@ -182,6 +213,11 @@
   }
 
   .task-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .task-checkbox-section {
     flex-direction: column;
     gap: 0.5rem;
   }

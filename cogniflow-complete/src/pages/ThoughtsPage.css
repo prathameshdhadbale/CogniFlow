@@ -6,6 +6,7 @@
   color: var(--text-secondary);
   margin-bottom: 1rem;
   font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .thoughts-list {
@@ -15,19 +16,144 @@
 }
 
 .thought-item {
-  padding: 1rem;
   background: var(--surface-dim);
   border-radius: 8px;
   border-left: 3px solid var(--accent-light);
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.thought-item:hover {
+  box-shadow: 0 2px 8px var(--shadow);
+  transform: translateX(4px);
 }
 
 .thought-content {
-  margin-bottom: 0.5rem;
+  padding: 1.25rem;
+}
+
+.thought-text {
   font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
 }
 
 .thought-meta {
   font-size: 0.85rem;
   color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.insights-badge {
+  background: var(--accent-light);
+  color: white;
+  padding: 0.15rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.affected-badge {
+  background: #28a745;
+  color: white;
+  padding: 0.15rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.thought-insights {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.insights-toggle {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--accent-light);
+  transition: background 0.2s;
+}
+
+.insights-toggle:hover {
+  background: var(--surface-dim);
+}
+
+.insights-content {
+  padding: 0 1.25rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.insight-item {
+  background: var(--surface-dim);
+  padding: 0.75rem;
+  border-radius: 6px;
+}
+
+.insight-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.insight-type {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.insight-type.energy {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.insight-type.preference {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.insight-type.frustration {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.insight-type.habit {
+  background: #d4edda;
+  color: #155724;
+}
+
+.insight-confidence {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.insight-signal {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-secondary);
+}
+
+.empty-message p {
   margin: 0;
 }

@@ -31,6 +31,9 @@ const InsightsPage = () => {
 
   if (loading) return <Loading message="Analyzing your patterns..." />;
 
+  const peakHour = insights?.peakHours?.[0] || 14;
+  const peakHourEnd = insights?.peakHours?.[insights.peakHours.length - 1] || 16;
+
   return (
     <div className="insights-page">
       <h1 className="section-title">Insights</h1>
@@ -38,61 +41,104 @@ const InsightsPage = () => {
 
       <div className="insights-grid">
         <div className="insight-card">
-          <div className="insight-number">{patterns?.peakHours?.[0] || '2'}:00 PM</div>
+          <div className="insight-number">
+            {peakHour}:00 - {peakHourEnd}:00
+          </div>
           <div className="insight-label">Your Peak Performance Time</div>
           <p className="insight-detail">
-            You complete tasks 40% faster during this window
+            Based on your task completion patterns
           </p>
         </div>
 
         <div className="insight-card">
-          <div className="insight-number">{patterns?.completionRate || '78'}%</div>
+          <div className="insight-number">{insights?.completionRate || 0}%</div>
           <div className="insight-label">Task Completion Rate</div>
-          <p className="insight-detail">Up 12% from last month</p>
+          <p className="insight-detail">
+            {insights?.completionRate > 75 ? 'Excellent progress!' :
+             insights?.completionRate > 50 ? 'Good work!' :
+             'Keep going!'}
+          </p>
         </div>
 
         <div className="insight-card">
-          <div className="insight-number">{patterns?.optimalTaskCount || '3'} tasks</div>
+          <div className="insight-number">{insights?.optimalTaskCount || 3} tasks</div>
           <div className="insight-label">Optimal Daily Load</div>
-          <p className="insight-detail">Your sweet spot for productivity</p>
+          <p className="insight-detail">
+            Your sweet spot for productivity
+          </p>
+        </div>
+
+        <div className="insight-card">
+          <div className="insight-number">{patterns?.consistencyStreak || 0} days</div>
+          <div className="insight-label">Consistency Streak</div>
+          <p className="insight-detail">
+            {patterns?.consistencyStreak > 7 ? 'Amazing streak!' :
+             patterns?.consistencyStreak > 3 ? 'Building momentum!' :
+             'Start your streak today!'}
+          </p>
         </div>
       </div>
 
-      <Card title="Key Patterns">
+      <Card title="📊 Key Patterns">
         <div className="patterns-list">
           <div className="pattern-item">
-            <h4>📈 Consistency Streak</h4>
+            <h4>⏰ Peak Performance Hours</h4>
             <p>
-              You've maintained consistent productivity for {patterns?.consistencyStreak || '12'} days. 
-              Thursdays and Fridays show the strongest performance.
+              Your data shows you're most productive between{' '}
+              <strong>{peakHour}:00 - {peakHourEnd}:00</strong>.
+              Schedule your most important tasks during this window for best results.
             </p>
           </div>
 
           <div className="pattern-item">
-            <h4>🎯 Load Tolerance</h4>
+            <h4>🎯 Optimal Task Load</h4>
             <p>
-              You handle up to {patterns?.optimalTaskCount || '3'} medium-load tasks well. 
-              Beyond that, completion rate drops by 35%. The system adjusts scheduling accordingly.
+              You perform best with <strong>{insights?.optimalTaskCount || 3} tasks</strong> per day.
+              Your load tolerance is <strong>{insights?.loadTolerance || 'medium'}</strong>.
+              {insights?.loadTolerance === 'low' && ' Consider breaking large tasks into smaller chunks.'}
+              {insights?.loadTolerance === 'high' && ' You handle multiple tasks well!'}
             </p>
           </div>
 
           <div className="pattern-item">
-            <h4>⚡ Energy Patterns</h4>
+            <h4>📈 Task Completion Performance</h4>
             <p>
-              Your energy peaks between {patterns?.peakHours?.[0] || '2'}-{patterns?.peakHours?.[2] || '4'} PM. 
-              Mornings are better for lighter tasks. Late evenings show decreased focus.
+              Current completion rate: <strong>{insights?.completionRate || 0}%</strong>.
+              {insights?.completionRate > 80 && ' Excellent! Youre crushing your goals.'}
+              {insights?.completionRate > 60 && insights?.completionRate <= 80 && ' Good progress! Keep it up.'}
+              {insights?.completionRate <= 60 && ' Focus on completing fewer tasks fully rather than starting many.'}
             </p>
           </div>
 
           <div className="pattern-item">
-            <h4>🔄 Planning vs Execution</h4>
+            <h4>🔄 Recent Activity</h4>
             <p>
-              You tend to overestimate capacity by about 20%. 
-              The system now factors this into scheduling predictions.
+              Recent reflections: <strong>{patterns?.recentReflections || 0}</strong> in the last week.
+              {patterns?.recentReflections === 0 && ' Start logging reflections to help the AI understand you better!'}
+              {patterns?.recentReflections > 5 && ' Great self-awareness! The AI is learning your patterns.'}
             </p>
           </div>
         </div>
       </Card>
+
+      {(!insights || insights.completionRate === 0) && (
+        <Card title="💡 Getting Started">
+          <div className="getting-started">
+            <p>
+              <strong>Build your insights!</strong> CogniFlow learns from your actual behavior:
+            </p>
+            <ul>
+              <li>✅ Create and complete tasks regularly</li>
+              <li>💭 Share thoughts about your work style</li>
+              <li>📝 Log daily reflections</li>
+              <li>🤖 Use AI scheduling to optimize your time</li>
+            </ul>
+            <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>
+              The more you use CogniFlow, the smarter it gets about your productivity patterns!
+            </p>
+          </div>
+        </Card>
+      )}
     </div>
   );
 };

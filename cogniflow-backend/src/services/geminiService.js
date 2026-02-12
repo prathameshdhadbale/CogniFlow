@@ -1,32 +1,33 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Validate environment variables
 if (!process.env.GEMINI_API_KEY) {
     console.error('❌ GEMINI_API_KEY is not set in .env file');
 }
 
-if (!process.env.GEMINI_MODEL) {
-    console.warn('⚠️ GEMINI_MODEL not set, using default: gemini-1.5-pro');
-}
-
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ 
-    model: process.env.GEMINI_MODEL || 'gemini-1.5-pro' 
+const model = genAI.getGenerativeModel({
+    model: process.env.GEMINI_MODEL || 'gemini-1.5-flash-latest'
 });
 
+/**
+ * UPDATED: Extraction focused, zero-fluff prompt.
+ * Treats user thoughts as objective data points.
+ */
 const processThought = async (thoughtContent, userContext) => {
     try {
         console.log('🤖 Processing thought with AI...');
-        
-        const prompt = `You are analyzing a user's productivity thought to extract actionable insights.
+
+        const prompt = `Task: Extract productivity insights from a user's raw thought.
+Role: Objective Data Analyst.
+Constraint: Do not interpret beyond the text. If the user expresses a preference, accept it as fact.
 
 User Context:
-- Current patterns: ${JSON.stringify(userContext.patterns)}
-- Recent tasks: ${userContext.recentTasksCount || 0} tasks
+- Patterns: ${JSON.stringify(userContext.patterns)}
+- Recent Tasks: ${userContext.recentTasksCount || 0}
 
 User's Thought: "${thoughtContent}"
 
-Analyze this thought and extract insights. Return ONLY a JSON object (no markdown, no code blocks) with this structure:
+Analyze and return ONLY a JSON object (no markdown):
 {
   "insights": [
     {
@@ -37,131 +38,119 @@ Analyze this thought and extract insights. Return ONLY a JSON object (no markdow
   ]
 }
 
-Focus on:
-- Energy levels and timing preferences
-- Work style preferences
-- Frustrations or blockers
-- Habit patterns
-
-Return at least 1-3 insights.`;
+Focus strictly on work style preferences and energy blockers.`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
-        
-        console.log('📄 Raw AI response:', text);
-        
+
         const cleaned = text.replace(/```json\n?|\n?```/g, '').trim();
         const parsed = JSON.parse(cleaned);
-        
-        console.log('✅ Parsed insights:', parsed.insights);
-        
+
         return parsed.insights || [];
     } catch (error) {
         console.error('❌ Error processing thought:', error.message);
-        console.error('Full error:', error);
-        
-        // Return fallback insights
         return [{
             type: 'preference',
-            signal: 'Unable to process thought automatically. Manual review needed.',
+            signal: 'Manual review needed.',
             confidence: 0.5
         }];
     }
 };
 
+/**
+ * UPDATED: Prioritizes user task list over "optimal" limits.
+ * Will suggest an alternative only once in the "warnings" array.
+ */
 const generateSchedule = async (tasks, userPatterns) => {
     try {
         console.log('🤖 Generating AI schedule...');
-        
-        const prompt = `You are an intelligent scheduling assistant. Create an optimal schedule for these tasks.
+
+        const prompt = `Role: Precision Scheduler.
+Goal: Organize these tasks into a 7-day schedule.
+Rule: Do exactly as the user says. If they provide 10 tasks, schedule all 10.
+Suggestion Policy: If the load is inefficient, you may offer ONE alternative suggestion in the "warnings" field, but you must still fulfill the requested schedule first.
 
 User Patterns:
-${JSON.stringify(userPatterns, null, 2)}
+- Peak hours: ${userPatterns.peakHours || [14, 15, 16]}
+- Optimal count: ${userPatterns.optimalTaskCount || 3}
+- Load tolerance: ${userPatterns.loadTolerance || 'medium'}
 
-Tasks to Schedule:
-${JSON.stringify(tasks, null, 2)}
+Tasks:
+${JSON.stringify(tasks.map(t => ({
+    id: t._id,
+    title: t.title,
+    difficulty: t.difficulty,
+    priority: t.priority,
+    duration: t.estimatedDuration
+})), null, 2)}
 
-Rules:
-1. Schedule difficult tasks during peak hours: ${userPatterns.peakHours || [14, 15, 16]}
-2. Respect load tolerance: user handles ${userPatterns.optimalTaskCount || 3} tasks optimally
-3. Consider deadlines but prioritize human capacity
-4. Leave buffer time between tasks
-5. Don't overload - better to postpone than burn out
+Current Time: ${new Date().toISOString()}
 
-Return ONLY a JSON object (no markdown, no code blocks) with this structure:
+Return ONLY JSON:
 {
   "schedule": [
     {
-      "taskId": "task._id here",
-      "scheduledFor": "2024-02-08T14:00:00Z",
-      "scheduledEndTime": "2024-02-08T15:30:00Z",
-      "reason": "Why scheduled here"
+      "taskId": "id",
+      "scheduledFor": "ISO String",
+      "scheduledEndTime": "ISO String",
+      "reason": "Short reason"
     }
   ],
   "totalLoad": "light|optimal|heavy",
-  "warnings": ["any concerns"]
+  "warnings": ["Suggest alternative ONLY once if capacity is exceeded"]
 }`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
-        
-        console.log('📄 Raw AI schedule response:', text);
-        
+
         const cleaned = text.replace(/```json\n?|\n?```/g, '').trim();
         const parsed = JSON.parse(cleaned);
-        
-        console.log('✅ Generated schedule:', parsed);
-        
+
         return parsed;
     } catch (error) {
         console.error('❌ Error generating schedule:', error.message);
-        console.error('Full error:', error);
-        
-        return {
-            schedule: [],
-            totalLoad: 'optimal',
-            warnings: ['AI scheduling temporarily unavailable. Error: ' + error.message]
-        };
+        return { schedule: [], totalLoad: 'optimal', warnings: [error.message] };
     }
 };
 
+/**
+ * UPDATED: "Listen first" logic.
+ * Concise (2-3 sentences), non-argumentative, and compliant.
+ */
 const chatWithAI = async (userMessage, userData) => {
     try {
         console.log('🤖 Chatting with AI...');
-        console.log('User message:', userMessage);
-        
-        const prompt = `You are CogniFlow's assistant helping users understand their productivity.
+
+        const todayTasksList = userData.todayTasks?.map(t =>
+            `- ${t.title} (${t.status})`
+        ).join('\n') || 'None';
+
+        const prompt = `You are the CogniFlow Assistant. Your primary directive is to be concise and compliant.
+
+Interaction Rules:
+1. DIRECT OBEDIENCE: If the user gives an instruction, follow it immediately. Do not argue.
+2. ONE-TIME SUGGESTION: You may suggest an alternative approach ONLY once. If the user persists, do as they ask without further comment.
+3. BREVITY: Limit responses to 2-3 sentences. No fluff or "I am here to help" introductions.
 
 User Data:
-- Patterns: ${JSON.stringify(userData.patterns)}
-- Today's Tasks: ${userData.todayTasksCount || 0} tasks
-- Recent Performance: ${userData.completionRate || 'N/A'}%
+- Completion Rate: ${userData.completionRate || 0}%
+- Peak Hours: ${userData.patterns?.peakHours?.join(', ') || '2-4 PM'}
+- Today's Tasks: ${todayTasksList}
 
 User Question: "${userMessage}"
 
-Guidelines:
-1. Be concise and helpful
-2. Reference user's actual data
-3. Explain scheduling decisions clearly
-4. Be empathetic about workload
-5. Suggest actionable improvements
-
-Respond naturally and conversationally in 2-3 sentences.`;
+Acknowledge the data, fulfill the request, and keep it brief.`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
-        
-        console.log('✅ AI response:', text);
-        
-        return text;
+
+        return text.trim();
     } catch (error) {
         console.error('❌ Error in chat:', error.message);
-        console.error('Full error:', error);
-        
-        return "I'm having trouble connecting right now. Please try again in a moment. Error: " + error.message;
+        return "I'm having trouble connecting. Please try again.";
     }
 };
 

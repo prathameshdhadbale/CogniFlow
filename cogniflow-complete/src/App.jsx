@@ -2,12 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store';
 import Header from './components/common/Header';
-import DashboardPage from './pages/DashboardPage';
+import DashboardPage from './pages/DashboardPage1';
 import TasksPage from './pages/TasksPage';
 import ThoughtsPage from './pages/ThoughtsPage';
 import ReflectionsPage from './pages/ReflectionsPage';
 import InsightsPage from './pages/InsightsPage';
 import ChatPage from './pages/ChatPage';
+import SchedulePage from './pages/SchedulePage';
 import LoginPage from './pages/LoginPage';
 import './App.css';
 
@@ -30,6 +31,7 @@ function App() {
             <Route path="/reflections" element={<ReflectionsPage />} />
             <Route path="/insights" element={<InsightsPage />} />
             <Route path="/chat" element={<ChatPage />} />
+            <Route path="/schedule" element={<SchedulePage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
