@@ -1,28 +1,27 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import './Button.css';
 
-const Button = ({ 
-  children, 
-  variant = 'primary', 
-  onClick, 
-  type = 'button',
-  disabled = false,
+const Button = ({
+  children,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  disabled,
   className = '',
-  ...props 
+  type = 'button',
+  ...props
 }) => {
   return (
-    <motion.button
-      className={`btn btn-${variant} ${className}`}
-      onClick={onClick}
+    <button
       type={type}
+      className={`btn btn-${variant} btn-${size} ${className}`.trim()}
       disabled={disabled}
-      whileHover={!disabled ? { y: -2 } : {}}
-      whileTap={!disabled ? { scale: 0.98 } : {}}
+      aria-busy={disabled}
       {...props}
     >
-      {children}
-    </motion.button>
+      {icon && <span className="btn-icon" aria-hidden>{icon}</span>}
+      <span>{children}</span>
+    </button>
   );
 };
 

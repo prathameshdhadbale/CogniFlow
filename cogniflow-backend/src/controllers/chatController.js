@@ -11,21 +11,24 @@ const sendMessage = async (req, res) => {
         // Get comprehensive user data for context
         const user = await User.findById(req.user.id);
 
+        // Get all tasks for context and potential actions
+        const allTasks = await Task.find({ userId: req.user.id })
+            .sort({ createdAt: -1 })
+            .limit(50);
+
         // Get today's tasks
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
-        const todayTasks = await Task.find({
-            userId: req.user.id,
-            scheduledFor: { $gte: today, $lt: tomorrow }
+        const todayTasks = allTasks.filter(task => {
+            if (task.scheduledFor) {
+                const scheduledDate = new Date(task.scheduledFor);
+                return scheduledDate >= today && scheduledDate < tomorrow;
+            }
+            return false;
         });
-
-        // Get all tasks for schedule overview
-        const allTasks = await Task.find({ userId: req.user.id })
-            .sort({ scheduledFor: 1 })
-            .limit(20);
 
         // Get recent thoughts
         const recentThoughts = await Thought.find({ userId: req.user.id })
@@ -50,6 +53,16 @@ const sendMessage = async (req, res) => {
             patterns: user.patterns,
             todayTasksCount: todayTasks.length,
             completionRate,
+            allTasks: allTasks.map(t => ({
+                id: t._id.toString(),
+                title: t.title,
+                status: t.status,
+                scheduledFor: t.scheduledFor,
+                deadline: t.deadline,
+                priority: t.priority,
+                difficulty: t.difficulty,
+                estimatedDuration: t.estimatedDuration
+            })),
             todayTasks: todayTasks.map(t => ({
                 title: t.title,
                 status: t.status,
@@ -57,13 +70,6 @@ const sendMessage = async (req, res) => {
                 difficulty: t.difficulty,
                 priority: t.priority
             })),
-            allScheduledTasks: allTasks
-                .filter(t => t.scheduledFor && t.status !== 'completed')
-                .map(t => ({
-                    title: t.title,
-                    scheduledFor: t.scheduledFor,
-                    status: t.status
-                })),
             recentThoughts: recentThoughts.map(t => ({
                 content: t.content,
                 insights: t.processedInsights,
@@ -77,11 +83,13 @@ const sendMessage = async (req, res) => {
             }))
         };
 
-        // Get AI response with full context
-        const aiResponse = await chatWithAI(message, userData);
+        // Get AI response with task management capabilities
+        const aiResponse = await chatWithAI(message, userData, req.user.id);
 
         res.status(200).json({
-            message: aiResponse,
+            message: aiResponse.message,
+            action: aiResponse.action,
+            data: aiResponse.data,
             timestamp: new Date()
         });
     } catch (error) {

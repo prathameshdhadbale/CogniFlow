@@ -7,37 +7,55 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const logout = useStore(state => state.logout);
+  const user = useStore(state => state.user);
 
   const navItems = [
-    { path: '/', label: 'Dashboard' },
-    { path: '/tasks', label: 'Tasks' },
-    { path: '/schedule', label: 'Schedule' },
-    { path: '/thoughts', label: 'Thoughts' },
-    { path: '/reflections', label: 'Reflections' },
-    { path: '/insights', label: 'Insights' },
-    { path: '/chat', label: 'Assistant' },
+    { path: '/', label: 'Dashboard', icon: 'dashboard' },
+    { path: '/tasks', label: 'Tasks', icon: 'checklist' },
+    { path: '/schedule', label: 'Schedule', icon: 'calendar' },
+    { path: '/thoughts', label: 'Thoughts', icon: 'lightbulb' },
+    { path: '/reflections', label: 'Reflections', icon: 'auto_stories' },
+    { path: '/insights', label: 'Insights', icon: 'insights' },
+    { path: '/chat', label: 'Assistant', icon: 'smart_toy' },
   ];
 
   return (
-    <header className="header">
+    <header className="header-pro">
       <div className="header-container">
-        <div className="logo" onClick={() => navigate('/')}>
-          Cogni<span>Flow</span>
+        <div className="header-left">
+          <div className="logo-pro" onClick={() => navigate('/')}>
+            <div className="logo-icon">CF</div>
+            <div className="logo-text">
+              <span className="logo-name">CogniFlow</span>
+              <span className="logo-tagline">AI Scheduling</span>
+            </div>
+          </div>
         </div>
-        <nav className="nav">
+
+        <nav className="nav-pro">
           {navItems.map(item => (
             <button
               key={item.path}
-              className={`nav-btn ${location.pathname === item.path ? 'active' : ''}`}
+              className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
               onClick={() => navigate(item.path)}
             >
-              {item.label}
+              <span className="material-icons nav-icon">{item.icon}</span>
+              <span className="nav-label">{item.label}</span>
             </button>
           ))}
-          <button className="nav-btn logout-btn" onClick={logout}>
-            Logout
-          </button>
         </nav>
+
+        <div className="header-right">
+          <div className="user-menu">
+            <div className="user-avatar">
+              {user?.name?.charAt(0).toUpperCase() || 'U'}
+            </div>
+            <button className="logout-btn" onClick={logout}>
+              <span className="material-icons">logout</span>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
   );

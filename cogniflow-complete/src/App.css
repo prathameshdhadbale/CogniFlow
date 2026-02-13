@@ -1,15 +1,115 @@
 .app {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-secondary);
+}
+
+.app-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 50;
+  transition: transform var(--transition-base);
+  overflow: hidden;
+}
+
+.app-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 40;
+  backdrop-filter: blur(2px);
+}
+
+.app-main {
+  flex: 1;
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
-.container {
+.app-topbar {
+  height: 64px;
+  min-height: 64px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-6);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.app-content {
+  flex: 1;
+  padding: var(--space-8);
   max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+}
+
+.page-header {
+  margin-bottom: var(--space-8);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.page-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.025em;
+}
+
+.page-subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  font-weight: 400;
 }
 
 @media (max-width: 768px) {
-  .container {
-    padding: 1rem;
+  .app-sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .app-sidebar-overlay {
+    display: block;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  .app-sidebar.open + .app-sidebar-overlay {
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .app-main {
+    margin-left: 0;
+  }
+
+  .app-content {
+    padding: var(--space-4);
   }
 }

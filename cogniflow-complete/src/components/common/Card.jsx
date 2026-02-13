@@ -8,7 +8,7 @@ const Card = ({ children, title, className = '', hover = true, ...props }) => {
       className={`card ${className}`}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={hover ? { y: -2, boxShadow: '0 4px 16px var(--shadow-strong)' } : {}}
+      whileHover={hover ? { y: -2, boxShadow: 'var(--shadow-strong)' } : {}}
       transition={{ duration: 0.3 }}
       {...props}
     >

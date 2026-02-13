@@ -84,9 +84,9 @@ const LoginPage = () => {
               required
             />
 
-            <Button 
-              type="submit" 
-              variant="primary" 
+            <Button
+              type="submit"
+              variant="primary"
               disabled={loading}
               style={{ width: '100%', marginTop: '1rem' }}
             >

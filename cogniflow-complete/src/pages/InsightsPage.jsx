@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { insightsService } from '../services/insights';
-import Card from '../components/common/Card';
 import Loading from '../components/common/Loading';
 import toast from 'react-hot-toast';
 import './InsightsPage.css';
@@ -29,115 +28,109 @@ const InsightsPage = () => {
     }
   };
 
-  if (loading) return <Loading message="Analyzing your patterns..." />;
+  if (loading) return <Loading message="Loading insights..." />;
 
-  const peakHour = insights?.peakHours?.[0] || 14;
+  const peakHourStart = insights?.peakHours?.[0] || 14;
   const peakHourEnd = insights?.peakHours?.[insights.peakHours.length - 1] || 16;
 
   return (
     <div className="insights-page">
-      <h1 className="section-title">Insights</h1>
-      <p className="section-subtitle">Understanding how you work best</p>
-
-      <div className="insights-grid">
-        <div className="insight-card">
-          <div className="insight-number">
-            {peakHour}:00 - {peakHourEnd}:00
-          </div>
-          <div className="insight-label">Your Peak Performance Time</div>
-          <p className="insight-detail">
-            Based on your task completion patterns
-          </p>
-        </div>
-
-        <div className="insight-card">
-          <div className="insight-number">{insights?.completionRate || 0}%</div>
-          <div className="insight-label">Task Completion Rate</div>
-          <p className="insight-detail">
-            {insights?.completionRate > 75 ? 'Excellent progress!' :
-             insights?.completionRate > 50 ? 'Good work!' :
-             'Keep going!'}
-          </p>
-        </div>
-
-        <div className="insight-card">
-          <div className="insight-number">{insights?.optimalTaskCount || 3} tasks</div>
-          <div className="insight-label">Optimal Daily Load</div>
-          <p className="insight-detail">
-            Your sweet spot for productivity
-          </p>
-        </div>
-
-        <div className="insight-card">
-          <div className="insight-number">{patterns?.consistencyStreak || 0} days</div>
-          <div className="insight-label">Consistency Streak</div>
-          <p className="insight-detail">
-            {patterns?.consistencyStreak > 7 ? 'Amazing streak!' :
-             patterns?.consistencyStreak > 3 ? 'Building momentum!' :
-             'Start your streak today!'}
-          </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Insights</h1>
+          <p className="page-subtitle">AI-powered analytics and recommendations</p>
         </div>
       </div>
 
-      <Card title="📊 Key Patterns">
-        <div className="patterns-list">
-          <div className="pattern-item">
-            <h4>⏰ Peak Performance Hours</h4>
-            <p>
-              Your data shows you're most productive between{' '}
-              <strong>{peakHour}:00 - {peakHourEnd}:00</strong>.
-              Schedule your most important tasks during this window for best results.
+      {/* Key Metrics */}
+      <div className="metrics-grid">
+        <div className="metric-card">
+          <div className="metric-label">Peak Hours</div>
+          <div className="metric-value">{peakHourStart}:00 - {peakHourEnd}:00</div>
+          <div className="metric-trend positive">Best focus time</div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-label">Completion Rate</div>
+          <div className="metric-value">{insights?.completionRate || 0}%</div>
+          <div className="metric-trend positive">
+            {insights?.completionRate > 75 ? 'Excellent' :
+             insights?.completionRate > 50 ? 'Good' : 'Improving'}
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-label">Optimal Load</div>
+          <div className="metric-value">{insights?.optimalTaskCount || 3}</div>
+          <div className="metric-trend neutral">Tasks per day</div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-label">Streak</div>
+          <div className="metric-value">{patterns?.consistencyStreak || 0}</div>
+          <div className="metric-trend positive">Consecutive days</div>
+        </div>
+      </div>
+
+      {/* Patterns Analysis */}
+      <div className="patterns-container">
+        <h3 className="section-title">Productivity Patterns</h3>
+        <div className="patterns-grid">
+          <div className="pattern-card">
+            <div className="pattern-icon">⏰</div>
+            <h4 className="pattern-title">Peak Performance</h4>
+            <p className="pattern-description">
+              You're most productive between {peakHourStart}:00 - {peakHourEnd}:00.
+              Schedule important tasks during these hours.
             </p>
           </div>
 
-          <div className="pattern-item">
-            <h4>🎯 Optimal Task Load</h4>
-            <p>
-              You perform best with <strong>{insights?.optimalTaskCount || 3} tasks</strong> per day.
-              Your load tolerance is <strong>{insights?.loadTolerance || 'medium'}</strong>.
-              {insights?.loadTolerance === 'low' && ' Consider breaking large tasks into smaller chunks.'}
-              {insights?.loadTolerance === 'high' && ' You handle multiple tasks well!'}
+          <div className="pattern-card">
+            <div className="pattern-icon">🎯</div>
+            <h4 className="pattern-title">Task Load</h4>
+            <p className="pattern-description">
+              You perform best with {insights?.optimalTaskCount || 3} tasks per day.
+              Load tolerance: {insights?.loadTolerance || 'medium'}.
             </p>
           </div>
 
-          <div className="pattern-item">
-            <h4>📈 Task Completion Performance</h4>
-            <p>
-              Current completion rate: <strong>{insights?.completionRate || 0}%</strong>.
-              {insights?.completionRate > 80 && ' Excellent! Youre crushing your goals.'}
-              {insights?.completionRate > 60 && insights?.completionRate <= 80 && ' Good progress! Keep it up.'}
-              {insights?.completionRate <= 60 && ' Focus on completing fewer tasks fully rather than starting many.'}
+          <div className="pattern-card">
+            <div className="pattern-icon">📊</div>
+            <h4 className="pattern-title">Performance</h4>
+            <p className="pattern-description">
+              Current completion rate: {insights?.completionRate || 0}%.
+              {insights?.completionRate > 80 ? ' Excellent progress!' :
+               insights?.completionRate > 60 ? ' Good work!' :
+               ' Focus on completing tasks fully.'}
             </p>
           </div>
 
-          <div className="pattern-item">
-            <h4>🔄 Recent Activity</h4>
-            <p>
-              Recent reflections: <strong>{patterns?.recentReflections || 0}</strong> in the last week.
-              {patterns?.recentReflections === 0 && ' Start logging reflections to help the AI understand you better!'}
-              {patterns?.recentReflections > 5 && ' Great self-awareness! The AI is learning your patterns.'}
+          <div className="pattern-card">
+            <div className="pattern-icon">🔄</div>
+            <h4 className="pattern-title">Activity</h4>
+            <p className="pattern-description">
+              {patterns?.recentReflections || 0} reflections in the last week.
+              {patterns?.recentReflections > 5 ? ' Great self-awareness!' :
+               ' Log more reflections to improve insights.'}
             </p>
           </div>
         </div>
-      </Card>
+      </div>
 
+      {/* AI Recommendations */}
       {(!insights || insights.completionRate === 0) && (
-        <Card title="💡 Getting Started">
-          <div className="getting-started">
-            <p>
-              <strong>Build your insights!</strong> CogniFlow learns from your actual behavior:
-            </p>
-            <ul>
-              <li>✅ Create and complete tasks regularly</li>
-              <li>💭 Share thoughts about your work style</li>
-              <li>📝 Log daily reflections</li>
-              <li>🤖 Use AI scheduling to optimize your time</li>
-            </ul>
-            <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>
-              The more you use CogniFlow, the smarter it gets about your productivity patterns!
-            </p>
-          </div>
-        </Card>
+        <div className="recommendations-container">
+          <h3 className="section-title">Get Started</h3>
+          <p className="recommendations-description">
+            CogniFlow learns from your behavior to provide personalized insights:
+          </p>
+          <ul className="recommendations-list">
+            <li>Create and complete tasks regularly</li>
+            <li>Share thoughts about your work style</li>
+            <li>Log daily reflections</li>
+            <li>Use AI scheduling to optimize your time</li>
+          </ul>
+        </div>
       )}
     </div>
   );

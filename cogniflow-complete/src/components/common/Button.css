@@ -1,39 +1,81 @@
 .btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s var(--ease-out);
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  line-height: 1.5;
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
+.btn:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+/* Primary */
 .btn-primary {
-  background: var(--accent-light);
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
   color: white;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--accent);
-  box-shadow: 0 4px 12px rgba(15, 76, 117, 0.3);
+  background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-800) 100%);
+  box-shadow: var(--shadow-md);
 }
 
+/* Secondary */
 .btn-secondary {
-  background: var(--surface);
+  background: var(--bg-primary);
   color: var(--text-primary);
-  border: 1px solid var(--border);
+  border-color: var(--border);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-dim);
-  border-color: var(--accent-light);
+  background: var(--gray-50);
+  border-color: var(--gray-300);
+}
+
+/* Ghost */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--gray-100);
+  color: var(--text-primary);
+}
+
+/* Sizes */
+.btn-sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8125rem;
+}
+
+.btn-md {
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.875rem;
+}
+
+.btn-lg {
+  padding: var(--space-3) var(--space-6);
+  font-size: 0.9375rem;
+}
+
+.btn-icon {
+  font-size: 1.125rem;
+  line-height: 1;
 }

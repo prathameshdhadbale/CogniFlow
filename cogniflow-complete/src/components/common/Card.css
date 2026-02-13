@@ -1,17 +1,66 @@
 .card {
-  background: var(--surface);
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 8px var(--shadow);
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  transition: all 0.3s var(--ease-out);
+  overflow: hidden;
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--border);
+  background: var(--gray-50);
 }
 
 .card-title {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 500;
-  margin-bottom: 1rem;
-  color: var(--primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.card-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+.card-body {
+  padding: var(--space-6);
+}
+
+.card-footer {
+  padding: var(--space-5) var(--space-6);
+  border-top: 1px solid var(--border);
+  background: var(--gray-50);
+}
+
+/* Card Variants */
+.card-elevated {
+  box-shadow: var(--shadow-lg);
+  border: none;
+}
+
+.card-flat {
+  border: none;
+  background: transparent;
+}
+
+.card-bordered {
+  border-width: 2px;
+}
+
+/* Interactive Cards */
+.card-clickable {
+  cursor: pointer;
+}
+
+.card-clickable:hover {
+  border-color: var(--primary-300);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
 }
