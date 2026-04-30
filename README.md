@@ -1,72 +1,146 @@
-# CogniFlow - AI-Powered Scheduling System
 
-CogniFlow is an intelligent productivity system designed to optimize your daily schedule using the power of **Gemini AI**. It goes beyond a simple to-do list by analyzing your work patterns, energy levels, and task complexity to create an optimal workflow.
+# CogniFlow
 
-## 🚀 Key Features
+> An AI-powered productivity and scheduling system that goes beyond a simple to-do list.  
+> CogniFlow analyzes your work patterns, energy levels, and task complexity to build an optimal daily workflow using Gemini AI.
 
-* **AI-Powered Scheduling**: Automatically generates an optimal schedule by matching difficult tasks with your peak performance hours.
-* **Thought Processing**: Analyzes your raw thoughts to extract actionable insights about your habits, preferences, and blockers.
-* **Conversational AI Assistant**: A built-in chat interface that allows you to create, update, delete, or list tasks using natural language.
-* **Productivity Insights**: Tracks patterns like peak hours, optimal daily task counts, and consistency streaks to provide personalized productivity profiles.
-* **Full-Stack Management**: Includes dedicated pages for Tasks, Thoughts, Reflections, Insights, and a comprehensive Dashboard.
+---
 
-## 🛠️ Tech Stack
+## What it does
 
-### Backend
+Most productivity tools just store your tasks. CogniFlow thinks about them. It matches difficult tasks to your peak performance hours, extracts actionable insights from your raw thoughts, and lets you manage everything through a conversational AI assistant — in plain English.
 
-* **Runtime**: Node.js with Express
-* **AI Engine**: Google Generative AI (Gemini 1.5 Flash)
-* **Database**: MongoDB (via Mongoose) and PostgreSQL support
-* **Authentication**: JSON Web Tokens (JWT) and Bcrypt for secure password hashing
+---
 
-### Frontend
+## Features
 
-* **Framework**: React (v18.2.0)
-* **Routing**: React Router DOM
-* **State Management**: Zustand
-* **Animations**: Framer Motion
-* **Styling**: Custom CSS with a focus on a clean, modern UI
+- **AI Schedule Generator** — Gemini AI analyzes your tasks and energy patterns to produce an optimized daily schedule
+- **Thought Processing** — Write raw thoughts, AI extracts habits, preferences, and blockers from them
+- **Conversational AI Assistant** — Create, update, delete, or list tasks using natural language chat
+- **Productivity Insights** — Tracks peak hours, optimal task count, consistency streaks, and builds a personalized productivity profile
+- **Full Dashboard** — Dedicated pages for Tasks, Thoughts, Reflections, Insights, and Overview
+- **JWT Authentication** — Secure register and login with bcrypt password hashing
 
-## 📂 Project Structure
+---
 
-* `/cogniflow-backend`: Express server handling AI integration, database connections, and business logic.
-* `/cogniflow-complete`: React frontend containing the user interface and service layers for API communication.
+## Tech Stack
 
-## 🚦 Getting Started
+| Layer | Technology |
+|---|---|
+| Frontend Framework | React 18 |
+| Routing | React Router DOM |
+| State Management | Zustand |
+| Animations | Framer Motion |
+| Styling | Plain CSS |
+| Backend | Node.js + Express |
+| AI Engine | Google Gemini 1.5 Flash |
+| Database | MongoDB (Mongoose) |
+| Auth | JWT + bcrypt |
+
+---
+
+## Project Structure
+
+```
+CogniFlow/
+├── cogniflow-backend/          # Express server
+│   └── src/
+│       ├── routes/             # API route definitions
+│       ├── controllers/        # Business logic
+│       ├── models/             # Mongoose schemas
+│       ├── middleware/         # Auth middleware
+│       └── services/           # Gemini AI integration
+│
+├── cogniflow-complete/         # React frontend
+│   └── src/
+│       ├── pages/              # Dashboard, Tasks, Thoughts, Insights, Reflections
+│       ├── components/         # Reusable UI components
+│       ├── store/              # Zustand state management
+│       └── services/           # API call functions
+│
+└── README.md
+```
+
+---
+
+## Running Locally
 
 ### Prerequisites
+- Node.js 18+
+- MongoDB instance (local or Atlas)
+- Gemini API Key — get one free at [aistudio.google.com](https://aistudio.google.com)
 
-* Node.js & npm
-* MongoDB instance
-* Gemini API Key (Google AI Studio)
+### 1. Clone the repo
 
-### Installation
+```bash
+git clone https://github.com/prathameshdhadbale/CogniFlow.git
+cd CogniFlow
+```
 
-1. **Clone the repository**
-2. **Setup Backend**:
+### 2. Setup the backend
+
 ```bash
 cd cogniflow-backend
 npm install
-# Create a .env file with:
-# PORT=5000
-# MONGODB_URI=your_mongodb_uri
-# GEMINI_API_KEY=your_api_key
-# FRONTEND_URL=http://localhost:3000
-npm run dev
-
 ```
 
+Create a `.env` file in `cogniflow-backend/`:
 
-3. **Setup Frontend**:
+```env
+PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+GEMINI_API_KEY=your_gemini_api_key
+JWT_SECRET=your_secret_key
+FRONTEND_URL=http://localhost:3000
+```
+
+```bash
+npm run dev
+```
+
+Backend runs on `http://localhost:5000`
+
+### 3. Setup the frontend
+
 ```bash
 cd cogniflow-complete
 npm install
 npm start
-
 ```
 
+Frontend runs on `http://localhost:3000`
 
+---
 
-## 📄 License
+## API Overview
 
-This project is licensed under the **MIT License**.
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| POST | /api/auth/register | No | Register new user |
+| POST | /api/auth/login | No | Login and receive JWT |
+| GET | /api/tasks | Yes | Get all tasks |
+| POST | /api/tasks | Yes | Create new task |
+| PATCH | /api/tasks/:id | Yes | Update task |
+| DELETE | /api/tasks/:id | Yes | Delete task |
+| POST | /api/schedule/generate | Yes | Generate AI optimized schedule |
+| POST | /api/thoughts | Yes | Submit thought for AI processing |
+| GET | /api/insights | Yes | Get productivity insights |
+| POST | /api/assistant | Yes | Chat with AI assistant |
+
+---
+
+## How the AI Works
+
+**Schedule Generation** — When triggered, the backend sends your tasks, deadlines, and energy pattern data to Gemini 1.5 Flash with a structured prompt. Gemini returns a time-blocked schedule matched to your peak performance hours. The response is parsed and stored.
+
+**Thought Processing** — Raw text is sent to Gemini with a prompt asking it to extract structured insights — habits, blockers, preferences, and action items. Output is saved and surfaced on the Insights page.
+
+**AI Assistant** — A conversational interface where user messages are sent to Gemini with system context about available actions (create task, list tasks, etc.). Gemini decides the intent and the backend executes the corresponding database operation.
+
+---
+
+## Author
+
+**Prathamesh Dhadbale**  
+B.Tech Computer Science — IIIT Nagpur  
+[GitHub](https://github.com/prathameshdhadbale)
